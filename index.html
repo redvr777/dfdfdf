@@ -69,13 +69,20 @@ button,.sliderRow{font:inherit}
 <button class="modeBtn" data-mode="checker">CHECKERBOARD</button>
 <button class="modeBtn" data-mode="stair">SPIRAL STAIRCASE</button>
 <button class="modeBtn" data-mode="perspective">PERSPECTIVE FLIP</button>
+<button class="modeBtn" data-mode="hypno">HYPNO RINGS</button>
+<button class="modeBtn" data-mode="breath">BREATHING WORLD</button>
+<button class="modeBtn" data-mode="double">DOUBLE VISION</button>
+<button class="modeBtn" data-mode="liquid">LIQUID SPACE</button>
+<button class="modeBtn" data-mode="planet">ROTATING PLANET</button>
+<button class="modeBtn" data-mode="gridwarp">MORPHING GRID</button>
 <button class="modeBtn" data-mode="random">MIND MELT</button>
 </div>
 <div class="controls">
-<div class="sliderRow"><span>Intensity</span><input id="intensity" type="range" min="0" max="2" step=".01" value="1"></div>
-<div class="sliderRow"><span>Speed</span><input id="speed" type="range" min="0" max="2" step=".01" value="1"></div>
+<div class="sliderRow"><span>Intensity</span><input id="intensity" type="range" min="0" max="3" step=".01" value="2.2"></div>
+<div class="sliderRow"><span>Speed</span><input id="speed" type="range" min="0" max="3" step=".01" value="2.2"></div>
 <div class="smallButtons">
 <button id="comfort">COMFORT: OFF</button>
+<button id="overdrive">OVERDRIVE</button>
 <button id="menuToggle">HIDE MENU</button>
 </div>
 </div>
@@ -92,7 +99,7 @@ import { VRButton } from "three/addons/webxr/VRButton.js";
 let scene,camera,rig,renderer,clock,material,uniforms;
 let mouseX=0,mouseY=0,started=false;
 let audioCtx,masterGain;
-let mode="collapse",intensity=1,speed=1,comfort=false,randomTimer=0;
+let mode="collapse",intensity=2.2,speed=1.8,comfort=false,randomTimer=0;
 
 const startScreen=document.getElementById("startScreen");
 const menu=document.getElementById("menu");
@@ -361,8 +368,8 @@ function animate(){
    const choices=Object.keys(ids).filter(x=>x!=="random");
    setMode(choices[Math.floor(Math.random()*choices.length)]);
    mode="random";
-   uniforms.uMode.value=13;
-   modeName.textContent="MIND MELT // "+names[choices[Math.floor(Math.random()*choices.length)]];
+   uniforms.uMode.value=19;
+   modeName.textContent="MIND MELT // "+names[mode];
    overlayMode.textContent=modeName.textContent;
   }
  }
