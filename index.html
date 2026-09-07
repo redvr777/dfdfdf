@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PSYCHEDELIC COLLAPSE // VR ILLUSION LAB</title>
+<title>PSYCHEDELIC COLLAPSE // VR ILLUSION LAB — MEGA EDITION</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:monospace}
@@ -10,32 +10,39 @@ canvas{display:block}
 #overlay{position:fixed;top:0;left:0;width:100%;z-index:10;color:#fff;text-align:center;padding:12px 0;pointer-events:none;text-shadow:0 0 8px #f0f,0 0 16px #0ff;letter-spacing:3px;font-size:13px}
 #vrButtonContainer{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:40}
 #startScreen{position:fixed;inset:0;z-index:30;background:radial-gradient(circle at 50% 50%,#1a0033,#000 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;cursor:pointer;text-align:center;padding:0 20px}
-#startScreen h1{letter-spacing:5px;text-shadow:0 0 20px #f0f,0 0 40px #0ff;font-size:22px;margin-bottom:6px}
+#startScreen h1{letter-spacing:5px;text-shadow:0 0 20px #f0f,0 0 40px #0ff;font-size:24px;margin-bottom:6px;animation:hueshift 6s linear infinite}
+@keyframes hueshift{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
 #startScreen p{color:#c48fff;font-size:13px;letter-spacing:1.2px;max-width:520px;line-height:1.6}
-#startScreen .warn{color:#ff8fae;font-size:11px;margin-top:18px;max-width:460px}
+#startScreen .warn{color:#ff8fae;font-size:11px;margin-top:18px;max-width:460px;border:1px solid #ff8fae55;padding:10px 14px;border-radius:8px;background:#2a000f44}
 #hint{position:fixed;bottom:72px;width:100%;text-align:center;color:#aaa;font-size:11px;z-index:10;pointer-events:none}
 #menu{
- position:fixed;left:14px;top:14px;z-index:35;width:min(360px,calc(100vw - 28px));
- background:rgba(5,0,15,.82);border:1px solid rgba(255,255,255,.18);
+ position:fixed;left:14px;top:14px;z-index:35;width:min(380px,calc(100vw - 28px));
+ max-height:calc(100vh - 28px);overflow-y:auto;
+ background:rgba(5,0,15,.85);border:1px solid rgba(255,255,255,.18);
  border-radius:12px;padding:12px;box-sizing:border-box;color:#fff;
- backdrop-filter:blur(8px);box-shadow:0 0 30px rgba(255,0,255,.18)
+ backdrop-filter:blur(10px);box-shadow:0 0 40px rgba(255,0,255,.25)
 }
 #menu.hidden{display:none}
-.menuTitle{font-size:14px;letter-spacing:3px;color:#fff;margin-bottom:8px}
-#modeName{color:#ff8cff;font-size:12px;margin:5px 0 10px}
+#menu::-webkit-scrollbar{width:6px}
+#menu::-webkit-scrollbar-thumb{background:#ff55ee66;border-radius:4px}
+.menuTitle{font-size:14px;letter-spacing:3px;color:#fff;margin-bottom:8px;text-shadow:0 0 10px #f0f}
+#modeName{color:#ff8cff;font-size:12px;margin:5px 0 10px;min-height:14px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 button,.sliderRow{font:inherit}
 .modeBtn{
  background:#11091d;color:#ddd;border:1px solid #44204d;border-radius:7px;
- padding:8px 5px;font-size:10px;letter-spacing:.5px;cursor:pointer
+ padding:8px 5px;font-size:10px;letter-spacing:.5px;cursor:pointer;transition:transform .1s
 }
-.modeBtn.active{border-color:#ff55ee;box-shadow:0 0 12px #ff20e855;color:#fff}
+.modeBtn:hover{transform:scale(1.04)}
+.modeBtn.active{border-color:#ff55ee;box-shadow:0 0 14px #ff20e888;color:#fff;background:#22102e}
 .controls{margin-top:10px;border-top:1px solid #ffffff18;padding-top:9px}
 .sliderRow{display:flex;align-items:center;gap:7px;color:#bbb;font-size:10px;margin:6px 0}
 .sliderRow span{width:75px}
-.sliderRow input{flex:1}
-.smallButtons{display:flex;gap:6px;margin-top:8px}
-.smallButtons button{flex:1;background:#18101e;color:#fff;border:1px solid #43274b;border-radius:7px;padding:7px;font-size:10px}
+.sliderRow input{flex:1;accent-color:#ff40e0}
+.smallButtons{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.smallButtons button{flex:1;min-width:86px;background:#18101e;color:#fff;border:1px solid #43274b;border-radius:7px;padding:7px;font-size:10px;cursor:pointer}
+#overdrive.active{background:linear-gradient(90deg,#ff0055,#ff9900,#ffee00,#00ff88,#00c8ff,#a000ff);background-size:400% 400%;animation:overdriveBg 1.4s linear infinite;border-color:#fff;color:#000;font-weight:bold}
+@keyframes overdriveBg{0%{background-position:0% 50%}100%{background-position:100% 50%}}
 #reticle{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 10px #fff;opacity:.35;z-index:8;pointer-events:none}
 @media(max-width:600px){#menu{width:300px}.modeBtn{font-size:9px;padding:7px 3px}}
 </style>
@@ -43,17 +50,17 @@ button,.sliderRow{font:inherit}
 <body>
 <div id="startScreen">
 <h1>◈ PSYCHEDELIC COLLAPSE ◈</h1>
-<p>click / tap to enter · then explore the ILLUSION LAB</p>
-<p class="warn">Contains strong visual motion, fine patterns and flashing color. Stop if you feel discomfort. A comfort mode is available.</p>
+<p>click / tap to enter · then explore the MEGA ILLUSION LAB — 21 warped realities, layered starfields, reactive audio, and an OVERDRIVE mode that melts them all together.</p>
+<p class="warn">⚠ Contains strong visual motion, fine repeating patterns, shifting color and (in OVERDRIVE) rapid scene changes. Not recommended if you are prone to migraines, motion sickness, or photosensitive seizures. A COMFORT mode is available and OVERDRIVE can be toggled off at any time — press C or click COMFORT to soften everything instantly.</p>
 </div>
 
 <div id="overlay" style="display:none">◈ ILLUSION LAB // <span id="overlayMode">PSYCHEDELIC COLLAPSE</span> ◈</div>
-<div id="hint" style="display:none">mouse / headset movement to look · VR menu can be opened with the controller select ray</div>
+<div id="hint" style="display:none">mouse / headset movement to look · M = menu · C = comfort · O = overdrive · R = mind melt</div>
 <div id="reticle"></div>
 <div id="vrButtonContainer"></div>
 
 <div id="menu" class="hidden">
-<div class="menuTitle">◈ MIND LAB</div>
+<div class="menuTitle">◈ MIND LAB // MEGA</div>
 <div id="modeName">PSYCHEDELIC COLLAPSE</div>
 <div class="grid">
 <button class="modeBtn active" data-mode="collapse">COLLAPSE</button>
@@ -73,13 +80,22 @@ button,.sliderRow{font:inherit}
 <button class="modeBtn" data-mode="breath">BREATHING WORLD</button>
 <button class="modeBtn" data-mode="double">DOUBLE VISION</button>
 <button class="modeBtn" data-mode="liquid">LIQUID SPACE</button>
-<button class="modeBtn" data-mode="planet">ROTATING PLANET</button>
+<button class="modeBtn" data-mode="kaleido">KALEIDOSCOPE</button>
+<button class="modeBtn" data-mode="wormhole">WORMHOLE</button>
+<button class="modeBtn" data-mode="dna">DNA HELIX</button>
+<button class="modeBtn" data-mode="plasma">PLASMA STORM</button>
+<button class="modeBtn" data-mode="glitch">DATA GLITCH</button>
+<button class="modeBtn" data-mode="mandala">MANDALA</button>
+<button class="modeBtn" data-mode="aurora">AURORA FLOW</button>
 <button class="modeBtn" data-mode="gridwarp">MORPHING GRID</button>
 <button class="modeBtn" data-mode="random">MIND MELT</button>
 </div>
 <div class="controls">
-<div class="sliderRow"><span>Intensity</span><input id="intensity" type="range" min="0" max="3" step=".01" value="2.2"></div>
-<div class="sliderRow"><span>Speed</span><input id="speed" type="range" min="0" max="3" step=".01" value="2.2"></div>
+<div class="sliderRow"><span>Intensity</span><input id="intensity" type="range" min="0" max="4" step=".01" value="2.4"></div>
+<div class="sliderRow"><span>Speed</span><input id="speed" type="range" min="0" max="4" step=".01" value="2.2"></div>
+<div class="sliderRow"><span>Aberration</span><input id="aberration" type="range" min="0" max="2" step=".01" value=".6"></div>
+<div class="sliderRow"><span>Starfield</span><input id="starfield" type="range" min="0" max="1" step=".01" value=".8"></div>
+<div class="sliderRow"><span>QUALITY</span><input id="quality" type="range" min=".5" max="1" step=".01" value=".72"></div>
 <div class="smallButtons">
 <button id="comfort">COMFORT: OFF</button>
 <button id="overdrive">OVERDRIVE</button>
@@ -97,9 +113,13 @@ import * as THREE from "three";
 import { VRButton } from "three/addons/webxr/VRButton.js";
 
 let scene,camera,rig,renderer,clock,material,uniforms;
+let starLayers=[];
 let mouseX=0,mouseY=0,started=false;
-let audioCtx,masterGain;
-let mode="collapse",intensity=2.2,speed=1.8,comfort=false,randomTimer=0;
+let audioCtx,masterGain,driveShaper,filterNode,tones=[],subOsc,noiseFilter;
+let mode="collapse",intensity=2.4,speed=2.2,aberration=.6,starAmt=.8,comfort=false,randomTimer=0;
+let chaos=false,chaosTimer=0,prevIntensity=2.4,prevSpeed=2.2;
+let quality=0.72, frameAvg=16.7, frameStamp=performance.now();
+let shakeX=0,shakeY=0;
 
 const startScreen=document.getElementById("startScreen");
 const menu=document.getElementById("menu");
@@ -130,40 +150,58 @@ function makeImpulse(ctx,seconds,decay){
  for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)}
  return buf;
 }
+function makeDistortionCurve(amount){
+ const n=44100,curve=new Float32Array(n),k=amount;
+ for(let i=0;i<n;i++){const x=i*2/n-1;curve[i]=(3+k)*x*20*(Math.PI/180)/(Math.PI+k*Math.abs(x));}
+ return curve;
+}
 function initAudio(){
  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
  masterGain=audioCtx.createGain();masterGain.gain.value=.32;
- const convolver=audioCtx.createConvolver();convolver.buffer=makeImpulse(audioCtx,2.5,1.8);
- const wet=audioCtx.createGain();wet.gain.value=.32;
+ const convolver=audioCtx.createConvolver();convolver.buffer=makeImpulse(audioCtx,3.2,1.6);
+ const wet=audioCtx.createGain();wet.gain.value=.36;
  masterGain.connect(audioCtx.destination);
  masterGain.connect(convolver).connect(wet).connect(audioCtx.destination);
+
+ // Drifting filtered noise bed
  const noise=audioCtx.createBufferSource();noise.buffer=makeNoiseBuffer(audioCtx,4);noise.loop=true;
- const filter=audioCtx.createBiquadFilter();filter.type="bandpass";filter.frequency.value=1000;filter.Q.value=2.8;
- const gain=audioCtx.createGain();gain.gain.value=.07;
- noise.connect(filter).connect(gain).connect(masterGain);noise.start();
- window.__filter=filter;
- const freqs=[260,390,520];
- window.__tones=freqs.map((f,i)=>{
-  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-  o.type="sine";o.frequency.value=f;g.gain.value=.012+i*.003;o.connect(g).connect(masterGain);o.start();
-  return {o,g,f};
+ filterNode=audioCtx.createBiquadFilter();filterNode.type="bandpass";filterNode.frequency.value=1000;filterNode.Q.value=2.8;
+ const ngain=audioCtx.createGain();ngain.gain.value=.07;
+ noise.connect(filterNode).connect(ngain).connect(masterGain);noise.start();
+
+ // Chorused tone stack with individual panning
+ driveShaper=audioCtx.createWaveShaper();driveShaper.curve=makeDistortionCurve(0);driveShaper.oversample="2x";
+ driveShaper.connect(masterGain);
+ const freqs=[130.8,196,261.6,329.6,392,523.2];
+ tones=freqs.map((f,i)=>{
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain(),p=audioCtx.createStereoPanner?audioCtx.createStereoPanner():null;
+  o.type=i%2===0?"sine":"triangle";o.frequency.value=f;g.gain.value=.010+i*.0016;
+  if(p){o.connect(g).connect(p);p.connect(driveShaper);}else{o.connect(g).connect(driveShaper);}
+  o.start();
+  return {o,g,p,f,phase:Math.random()*10};
  });
+
+ // Sub bass pulse
+ subOsc=audioCtx.createOscillator();const subGain=audioCtx.createGain();
+ subOsc.type="sine";subOsc.frequency.value=55;subGain.gain.value=.05;
+ subOsc.connect(subGain).connect(masterGain);subOsc.start();
 }
 function init3D(){
  scene=new THREE.Scene();
- camera=new THREE.PerspectiveCamera(90,innerWidth/innerHeight,.05,200);
+ camera=new THREE.PerspectiveCamera(90,innerWidth/innerHeight,.05,300);
  rig=new THREE.Group();rig.add(camera);scene.add(rig);camera.position.set(0,0,0);
  renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:"high-performance",alpha:false});
- renderer.setPixelRatio(Math.min(devicePixelRatio,1));
+ renderer.setPixelRatio(Math.min(devicePixelRatio,0.75));
+ renderer.xr.setFramebufferScaleFactor(0.72);
  renderer.setSize(innerWidth,innerHeight);
  renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType("local-floor");
  document.body.appendChild(renderer.domElement);
  const b=VRButton.createButton(renderer);document.getElementById("vrButtonContainer").appendChild(b);
 
- const geo=new THREE.SphereGeometry(50,64,64);
+ const geo=new THREE.SphereGeometry(50,40,26);
  uniforms={
   uTime:{value:0},uMode:{value:0},uIntensity:{value:1},uSpeed:{value:1},
-  uComfort:{value:0},uMouse:{value:new THREE.Vector2()}
+  uComfort:{value:0},uMouse:{value:new THREE.Vector2()},uChaos:{value:0},uAberration:{value:.6}
  };
  material=new THREE.ShaderMaterial({
   uniforms,side:THREE.BackSide,depthWrite:false,
@@ -171,13 +209,25 @@ function init3D(){
   fragmentShader:`
  precision mediump float;
  varying vec3 vPos;
- uniform float uTime,uMode,uIntensity,uSpeed,uComfort;
+ uniform float uTime,uMode,uIntensity,uSpeed,uComfort,uChaos,uAberration;
  uniform vec2 uMouse;
  #define PI 3.14159265359
+ #define MODE_COUNT 21.0
 
  mat2 rot(float a){float s=sin(a),c=cos(a);return mat2(c,-s,s,c);}
  vec3 rainbow(float t){return .5+.5*cos(6.28318*(t+vec3(0.,.333,.667)));}
  float hash21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+ float noise2(vec2 p){
+   vec2 i=floor(p),f=fract(p);
+   float a=hash21(i),b=hash21(i+vec2(1.,0.)),c=hash21(i+vec2(0.,1.)),d=hash21(i+vec2(1.,1.));
+   vec2 u=f*f*(3.-2.*f);
+   return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);
+ }
+ float fbm(vec2 p){
+   float v=0.,amp=.5;
+   for(int i=0;i<4;i++){v+=amp*noise2(p);p*=2.02;amp*=.5;}
+   return v;
+ }
  float grid(vec2 p,float scale){
    vec2 q=abs(fract(p*scale)-.5);
    return 1.-smoothstep(.025,.06,min(q.x,q.y));
@@ -197,6 +247,51 @@ function init3D(){
    float spokes=.5+.5*cos(a*24.+z*9.);
    float bands=1.-smoothstep(.02,.11,abs(z-.5));
    return bands*(.35+.65*spokes);
+ }
+ vec2 kaleido(vec2 p,float sides){
+   float a=atan(p.y,p.x),r=length(p);
+   float seg=2.*PI/sides;
+   a=mod(a,seg);
+   a=abs(a-seg*.5);
+   return vec2(cos(a),sin(a))*r;
+ }
+ float wormhole(vec2 p,float t){
+   float r=max(length(p),.002),a=atan(p.y,p.x);
+   float streaks=pow(abs(sin(a*44.+r*3.-t*3.4)),18.);
+   return tunnel(p*1.9)*.75+streaks*.7;
+ }
+ float dnaHelix(vec2 p,float t){
+   float y=p.y*3.4;
+   float x1=sin(y+t)*.55, x2=sin(y+t+PI)*.55;
+   float s1=smoothstep(.07,0.,abs(p.x-x1));
+   float s2=smoothstep(.07,0.,abs(p.x-x2));
+   float rung=step(.92,fract(y*.6-t*.15))*smoothstep(.55,0.,abs(p.x));
+   return max(max(s1,s2),rung*.7);
+ }
+ float plasmaField(vec2 p,float t){
+   float v=0.;
+   v+=sin(p.x*3.1+t);
+   v+=sin(p.y*3.7-t*1.3);
+   v+=sin((p.x+p.y)*2.6+t*.8);
+   v+=sin(length(p)*5.2-t*2.1);
+   v+=fbm(p*1.4+t*.15)*1.6;
+   return v*.2+.5;
+ }
+ float glitchField(vec2 p,float t){
+   vec2 block=floor(p*9.+vec2(0.,floor(t*7.)));
+   float n=hash21(block);
+   float doGlitch=step(.86,n);
+   vec2 q=p+vec2((hash21(block+3.1)-.5)*doGlitch*.35,0.);
+   float base=grid(q,11.)*.7+.3*sin(length(q)*22.-t*1.4);
+   return mix(base,n,doGlitch*.55);
+ }
+ float auroraField(vec2 p,float t){
+   float bands=0.;
+   for(int i=0;i<3;i++){
+     float fi=float(i);
+     bands+=sin(p.x*(1.6+fi*.7)+t*(.25+.09*fi)+fbm(p*.6+fi)*3.)*.5+.5;
+   }
+   return bands/3.;
  }
  float illusion(float m,vec2 p){
    float t=uTime*uSpeed;
@@ -222,7 +317,7 @@ function init3D(){
    if(m<4.5)return spiral(p*1.5);
    if(m<5.5){
      float n=0.;vec2 q=p;
-     for(int i=0;i<5;i++){q=abs(q)/max(dot(q,q),.08)-.72;q*=rot(.35);n+=exp(-8.*abs(length(q)-.55));}
+     for(int i=0;i<4;i++){q=abs(q)/max(dot(q,q),.08)-.72;q*=rot(.35);n+=exp(-8.*abs(length(q)-.55));}
      return clamp(n*.28,0.,1.);
    }
    if(m<6.5){
@@ -259,23 +354,58 @@ function init3D(){
      q.x*=sign(flip+.02);
      return .5+.5*sin(q.x*14.+q.y*14.+t);
    }
-   return tunnel(p*(1.+.3*sin(t*.23)))+
-          spiral(p*.8+vec2(.15*sin(t*.31),.1*cos(t*.27)));
+   if(m<13.5){
+     return tunnel(p*(1.+.3*sin(t*.23)))+spiral(p*.8+vec2(.15*sin(t*.31),.1*cos(t*.27)));
+   }
+   if(m<14.5){
+     vec2 q=kaleido(p*rot(t*.12),6.+2.*sin(t*.05));
+     return rings(q,9.,t*.6)*.6+spiral(q*1.3)*.5;
+   }
+   if(m<15.5)return wormhole(p*1.3,t);
+   if(m<16.5)return dnaHelix(p*1.6,t);
+   if(m<17.5)return plasmaField(p*1.7,t);
+   if(m<18.5)return glitchField(p*1.5,t);
+   if(m<19.5){
+     vec2 q=kaleido(p,10.+4.*sin(t*.08));
+     return rings(q,14.,t*.4)*.55+plasmaField(q*1.4,t*.7)*.5;
+   }
+   if(m<20.5)return auroraField(p*1.4,t);
+   // gridwarp (id 21 in JS maps to fallback below)
+   {
+     vec2 q=p*rot(sin(t*.2)*.6);
+     q+=vec2(sin(q.y*3.+t*1.1),cos(q.x*3.5-t*.9))*(.2*uIntensity);
+     return grid(q,6.)*.6+.4*fbm(q*2.+t*.1);
+   }
  }
 
  void main(){
    vec3 dir=normalize(vPos);
-   dir.xy=rot(uMouse.x*.45)*dir.xy;
-   dir.yz=rot(uMouse.y*.30)*dir.yz;
+   float shakeAmt=uChaos*.05;
+   dir.xy=rot(uMouse.x*.45+sin(uTime*3.1)*shakeAmt)*dir.xy;
+   dir.yz=rot(uMouse.y*.30+cos(uTime*2.7)*shakeAmt)*dir.yz;
    float theta=atan(dir.z,dir.x),phi=asin(clamp(dir.y,-1.,1.));
-   float scale=2.25+uIntensity*.22;
+   float scale=2.25+uIntensity*.35;
    vec2 p=vec2(theta,phi*2.25)*scale;
+   p += vec2(sin(phi*18.0+uTime*1.2*uSpeed),cos(theta*16.0-uTime*1.1*uSpeed))
+        * (.055*uIntensity);
+
    float v=illusion(uMode,p);
-   float v2=illusion(uMode,p*1.013+vec2(.02,-.013));
-   float v3=illusion(uMode,p*.987+vec2(-.018,.011));
+
+   // Reality-melt blend: while chaos/overdrive is on, bleed in a second warped mode.
+   if(uChaos>.5){
+     float altMode=mod(uMode+7.0,MODE_COUNT);
+     vec2 q=p*1.35+vec2(sin(uTime*.55),cos(uTime*.47))*.4;
+     float vAlt=illusion(altMode,q);
+     v=mix(v,vAlt,.3+.25*sin(uTime*1.6));
+   }
+
+   float ab=.013*(1.+uAberration);
+   float v2=illusion(uMode,p*1.0+vec2(ab,-ab*.7));
+   float v3=illusion(uMode,p*1.0+vec2(-ab*.8,ab));
    vec3 col=vec3(v,v2,v3)*.45;
-   float hue=theta/PI*.5+uTime*.025;
-   col+=rainbow(hue)*v*.72;
+   float hue=theta/PI*.5+uTime*.03*(1.+uChaos*1.5);
+   col+=rainbow(hue)*v*.75;
+   col+=rainbow(hue+.25)*pow(v,3.)*.4;
 
    // Stronger peripheral distortion for the peripheral mode.
    float per=length(dir.xy);
@@ -286,11 +416,11 @@ function init3D(){
 
    // Central depth cue / fake hole.
    float center=acos(clamp(dot(dir,vec3(0.,0.,-1.)),-1.,1.));
-   float pulse=.23+.055*sin(uTime*1.2*uSpeed);
+   float pulse=.23+.055*sin(uTime*1.2*uSpeed)+.03*uChaos*sin(uTime*2.3);
    float core=1.-smoothstep(pulse-.045,pulse,center);
    float rim=1.-smoothstep(.0,.035,abs(center-pulse));
    col*=1.-core*.82;
-   col+=vec3(rim)*1.1;
+   col+=rainbow(uTime*.1)*rim*1.15;
 
    if(uComfort>.5){
      col*=.8;
@@ -303,9 +433,57 @@ function init3D(){
  });
  scene.add(new THREE.Mesh(geo,material));
 
+ // Layered reactive starfields for VR depth
+ function makeStarLayer(count,radius,size,color,speedMul){
+  const pos=new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+   const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=radius*(0.7+Math.random()*0.3);
+   pos[i*3]=r*Math.sin(ph)*Math.cos(th);
+   pos[i*3+1]=r*Math.sin(ph)*Math.sin(th);
+   pos[i*3+2]=r*Math.cos(ph);
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  const m=new THREE.PointsMaterial({color,size,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+  const pts=new THREE.Points(g,m);
+  pts.userData.speedMul=speedMul;
+  scene.add(pts);
+  return pts;
+ }
+ starLayers=[
+  makeStarLayer(900,40,.22,0xff66ff,.15),
+  makeStarLayer(700,32,.3,0x66ffff,-.22),
+  makeStarLayer(500,24,.4,0xffee66,.33)
+ ];
+
  clock=new THREE.Clock();
  addEvents();
  renderer.setAnimationLoop(animate);
+}
+function applyQuality(){
+ const q=quality;
+ renderer.setPixelRatio(Math.min(devicePixelRatio,q));
+ if(renderer.xr) renderer.xr.setFramebufferScaleFactor(q);
+}
+function setOverdrive(on){
+ chaos=on;
+ uniforms.uChaos.value=chaos?1:0;
+ const btn=document.getElementById("overdrive");
+ btn.textContent="OVERDRIVE"+(chaos?": ON":"");
+ btn.classList.toggle("active",chaos);
+ if(chaos){
+  prevIntensity=intensity;prevSpeed=speed;
+  intensity=Math.min(4,intensity+1.2);speed=Math.min(4,speed+1.1);
+  document.getElementById("intensity").value=intensity;
+  document.getElementById("speed").value=speed;
+  driveShaper.curve=makeDistortionCurve(28);
+  chaosTimer=clock?clock.getElapsedTime():0;
+ }else{
+  intensity=prevIntensity;speed=prevSpeed;
+  document.getElementById("intensity").value=intensity;
+  document.getElementById("speed").value=speed;
+  driveShaper.curve=makeDistortionCurve(0);
+ }
 }
 function addEvents(){
  addEventListener("resize",()=>{
@@ -318,20 +496,28 @@ function addEvents(){
   if(e.touches.length){mouseX=(e.touches[0].clientX/innerWidth-.5)*2;mouseY=(e.touches[0].clientY/innerHeight-.5)*2}
  });
  document.querySelectorAll(".modeBtn").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
- document.getElementById("intensity").addEventListener("input",e=>intensity=+e.target.value);
- document.getElementById("speed").addEventListener("input",e=>speed=+e.target.value);
+ document.getElementById("intensity").addEventListener("input",e=>{intensity=+e.target.value;if(!chaos)prevIntensity=intensity;});
+ document.getElementById("speed").addEventListener("input",e=>{speed=+e.target.value;if(!chaos)prevSpeed=speed;});
+ document.getElementById("aberration").addEventListener("input",e=>aberration=+e.target.value);
+ document.getElementById("starfield").addEventListener("input",e=>starAmt=+e.target.value);
+ document.getElementById("quality").addEventListener("input",e=>{quality=+e.target.value;applyQuality();});
  document.getElementById("comfort").addEventListener("click",()=>{
   comfort=!comfort;
   document.getElementById("comfort").textContent="COMFORT: "+(comfort?"ON":"OFF");
+  if(comfort&&chaos)setOverdrive(false);
+ });
+ document.getElementById("overdrive").addEventListener("click",()=>{
+  if(comfort)return; // comfort mode takes priority; ignore overdrive while it's on
+  setOverdrive(!chaos);
  });
  document.getElementById("menuToggle").addEventListener("click",()=>{
   menu.classList.toggle("hidden");
   document.getElementById("menuToggle").textContent=menu.classList.contains("hidden")?"SHOW MENU":"HIDE MENU";
  });
- // Desktop keyboard shortcuts; also useful when testing before entering VR.
  addEventListener("keydown",e=>{
   if(e.key==="m"||e.key==="M"){menu.classList.toggle("hidden");}
-  if(e.key==="c"||e.key==="C"){comfort=!comfort;document.getElementById("comfort").textContent="COMFORT: "+(comfort?"ON":"OFF");}
+  if(e.key==="c"||e.key==="C"){document.getElementById("comfort").click();}
+  if(e.key==="o"||e.key==="O"){document.getElementById("overdrive").click();}
   if(e.key==="r"||e.key==="R")setMode("random");
  });
 }
@@ -339,22 +525,39 @@ const names={
  collapse:"PSYCHEDELIC COLLAPSE",tunnel:"INFINITE TUNNEL",impossible:"IMPOSSIBLE ROOM",
  mirror:"INFINITE MIRROR",spiral:"SPIRAL VISION",fractal:"FRACTAL VOID",warp:"REALITY WARP",
  peripheral:"PERIPHERAL ILLUSION",afterimage:"COLOR AFTERIMAGE",blackhole:"BLACK HOLE",
- checker:"CHECKERBOARD",stair:"SPIRAL STAIRCASE",perspective:"PERSPECTIVE FLIP",random:"MIND MELT"
+ checker:"CHECKERBOARD",stair:"SPIRAL STAIRCASE",perspective:"PERSPECTIVE FLIP",
+ kaleido:"KALEIDOSCOPE",wormhole:"WORMHOLE",dna:"DNA HELIX",plasma:"PLASMA STORM",
+ glitch:"DATA GLITCH",mandala:"MANDALA",aurora:"AURORA FLOW",gridwarp:"MORPHING GRID",
+ random:"MIND MELT"
 };
-const ids={collapse:0,tunnel:1,impossible:2,mirror:3,spiral:4,fractal:5,warp:6,peripheral:7,afterimage:8,blackhole:9,checker:10,stair:11,perspective:12,random:13};
+const ids={
+ collapse:0,tunnel:1,impossible:2,mirror:3,spiral:4,fractal:5,warp:6,peripheral:7,
+ afterimage:8,blackhole:9,checker:10,stair:11,perspective:12,hypno:13,breath:13,double:13,liquid:13,
+ kaleido:14,wormhole:15,dna:16,plasma:17,glitch:18,mandala:19,aurora:20,gridwarp:21,random:22
+};
 function setMode(next){
  mode=next;
- uniforms.uMode.value=ids[next];
- modeName.textContent=names[next];
- overlayMode.textContent=names[next];
+ uniforms.uMode.value=ids[next]!==undefined?ids[next]:0;
+ modeName.textContent=names[next]||next.toUpperCase();
+ overlayMode.textContent=modeName.textContent;
  document.querySelectorAll(".modeBtn").forEach(b=>b.classList.toggle("active",b.dataset.mode===next));
 }
 function animate(){
+ const now=performance.now();
+ const dt=now-frameStamp; frameStamp=now;
+ frameAvg=frameAvg*.96+dt*.04;
+ if(!renderer.xr.isPresenting && frameAvg>22 && quality>.55){
+   quality=Math.max(.55,quality-.03); document.getElementById("quality").value=quality; applyQuality();
+ } else if(!renderer.xr.isPresenting && frameAvg<15 && quality<.85){
+   quality=Math.min(.85,quality+.01); document.getElementById("quality").value=quality; applyQuality();
+ }
  const t=clock.getElapsedTime();
  uniforms.uTime.value=t;
- uniforms.uIntensity.value=intensity;
- uniforms.uSpeed.value=speed;
+ uniforms.uIntensity.value=comfort?Math.min(intensity,1.4):intensity;
+ uniforms.uSpeed.value=comfort?Math.min(speed,1.2):speed;
  uniforms.uComfort.value=comfort?1:0;
+ uniforms.uChaos.value=(chaos&&!comfort)?1:0;
+ uniforms.uAberration.value=comfort?Math.min(aberration,.4):aberration;
 
  if(!renderer.xr.isPresenting){
   uniforms.uMouse.value.x+=(mouseX-uniforms.uMouse.value.x)*.05;
@@ -366,20 +569,42 @@ function animate(){
   if(t-randomTimer>9){
    randomTimer=t;
    const choices=Object.keys(ids).filter(x=>x!=="random");
-   setMode(choices[Math.floor(Math.random()*choices.length)]);
+   const picked=choices[Math.floor(Math.random()*choices.length)];
+   setMode(picked);
    mode="random";
-   uniforms.uMode.value=19;
-   modeName.textContent="MIND MELT // "+names[mode];
+   uniforms.uMode.value=ids.random;
+   modeName.textContent="MIND MELT // "+(names[picked]||picked.toUpperCase());
    overlayMode.textContent=modeName.textContent;
   }
  }
+ // Overdrive auto-cycles modes faster for sensory overload, unless comfort overrides it.
+ if(chaos&&!comfort){
+  if(t-chaosTimer>4.5){
+   chaosTimer=t;
+   const choices=Object.keys(ids).filter(x=>x!=="random");
+   const picked=choices[Math.floor(Math.random()*choices.length)];
+   setMode(picked);
+  }
+ }
 
- if(window.__filter)window.__filter.frequency.setTargetAtTime(
-   700+Math.sin(t*.13)*350, audioCtx.currentTime,.15
- );
- if(window.__tones)window.__tones.forEach((x,i)=>{
-   x.o.frequency.setTargetAtTime(x.f*(1+Math.sin(t*.07+i)*.012*speed),audioCtx.currentTime,.3);
+ // Rotate starfield layers at different rates for parallax depth.
+ starLayers.forEach(layer=>{
+  layer.rotation.y+=0.0006*speed*layer.userData.speedMul*(1+ (chaos?1.5:0));
+  layer.rotation.x+=0.0003*speed*layer.userData.speedMul;
+  layer.material.opacity=.15+.75*starAmt;
+  layer.visible=starAmt>.02;
  });
+
+ if(filterNode)filterNode.frequency.setTargetAtTime(
+   700+Math.sin(t*.13*(1+ (chaos?1.4:0)))*(350+ (chaos?250:0)), audioCtx.currentTime,.15
+ );
+ if(tones.length)tones.forEach((x,i)=>{
+   const wob=Math.sin(t*.07+x.phase+i)*.012*speed*(chaos?2.2:1);
+   x.o.frequency.setTargetAtTime(x.f*(1+wob),audioCtx.currentTime,.25);
+   if(x.p)x.p.pan.setTargetAtTime(Math.sin(t*.2+i*1.3)*(chaos?.9:.4),audioCtx.currentTime,.3);
+ });
+ if(subOsc)subOsc.frequency.setTargetAtTime(55+ (chaos?18*Math.sin(t*.4):0), audioCtx.currentTime,.2);
+
  renderer.render(scene,camera);
 }
 </script>
