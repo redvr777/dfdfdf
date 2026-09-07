@@ -2,394 +2,378 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PSYCHEDELIC COLLAPSE // VR</title>
+<title>PSYCHEDELIC COLLAPSE // VR ILLUSION LAB</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; font-family:monospace; }
-  #overlay {
-    position:fixed; top:0; left:0; width:100%; z-index:10;
-    color:#fff; text-align:center; padding:14px 0; pointer-events:none;
-    text-shadow: 0 0 8px #f0f, 0 0 16px #0ff; letter-spacing: 4px; font-size: 14px;
-  }
-  #vrButtonContainer { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:20; }
-  canvas { display:block; }
-  #startScreen {
-    position:fixed; inset:0; z-index:30; background:radial-gradient(circle at 50% 50%, #1a0033, #000 70%);
-    display:flex; align-items:center; justify-content:center; flex-direction:column; color:#fff; cursor:pointer;
-    text-align:center; padding: 0 20px;
-  }
-  #startScreen h1 { letter-spacing:6px; text-shadow:0 0 20px #f0f, 0 0 40px #0ff; font-size:22px; margin-bottom:6px; }
-  #startScreen p { color:#c48fff; font-size:13px; letter-spacing:1.5px; max-width:480px; line-height:1.6; }
-  #startScreen .warn { color:#ff8fae; font-size:11px; margin-top:18px; max-width:440px; }
-  #hint {
-    position:fixed; bottom:80px; width:100%; text-align:center; color:#aaa;
-    font-size:12px; z-index:10; pointer-events:none;
-  }
-  #errorScreen {
-    position:fixed; inset:0; z-index:50; background:#100; color:#ff6b6b;
-    display:none; align-items:center; justify-content:center; flex-direction:column;
-    font-family:monospace; text-align:left; padding:24px; box-sizing:border-box;
-  }
-  #errorScreen.show { display:flex; }
-  #errorScreen h2 { color:#ff8fae; letter-spacing:2px; margin-bottom:12px; }
-  #errorScreen pre {
-    background:#1a0000; border:1px solid #ff6b6b33; padding:14px; border-radius:6px;
-    max-width:700px; max-height:50vh; overflow:auto; white-space:pre-wrap; word-break:break-word;
-    font-size:12px; line-height:1.5;
-  }
-  #errorScreen p.tip { color:#c48fff; max-width:700px; font-size:13px; line-height:1.6; }
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:monospace}
+canvas{display:block}
+#overlay{position:fixed;top:0;left:0;width:100%;z-index:10;color:#fff;text-align:center;padding:12px 0;pointer-events:none;text-shadow:0 0 8px #f0f,0 0 16px #0ff;letter-spacing:3px;font-size:13px}
+#vrButtonContainer{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:40}
+#startScreen{position:fixed;inset:0;z-index:30;background:radial-gradient(circle at 50% 50%,#1a0033,#000 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;cursor:pointer;text-align:center;padding:0 20px}
+#startScreen h1{letter-spacing:5px;text-shadow:0 0 20px #f0f,0 0 40px #0ff;font-size:22px;margin-bottom:6px}
+#startScreen p{color:#c48fff;font-size:13px;letter-spacing:1.2px;max-width:520px;line-height:1.6}
+#startScreen .warn{color:#ff8fae;font-size:11px;margin-top:18px;max-width:460px}
+#hint{position:fixed;bottom:72px;width:100%;text-align:center;color:#aaa;font-size:11px;z-index:10;pointer-events:none}
+#menu{
+ position:fixed;left:14px;top:14px;z-index:35;width:min(360px,calc(100vw - 28px));
+ background:rgba(5,0,15,.82);border:1px solid rgba(255,255,255,.18);
+ border-radius:12px;padding:12px;box-sizing:border-box;color:#fff;
+ backdrop-filter:blur(8px);box-shadow:0 0 30px rgba(255,0,255,.18)
+}
+#menu.hidden{display:none}
+.menuTitle{font-size:14px;letter-spacing:3px;color:#fff;margin-bottom:8px}
+#modeName{color:#ff8cff;font-size:12px;margin:5px 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+button,.sliderRow{font:inherit}
+.modeBtn{
+ background:#11091d;color:#ddd;border:1px solid #44204d;border-radius:7px;
+ padding:8px 5px;font-size:10px;letter-spacing:.5px;cursor:pointer
+}
+.modeBtn.active{border-color:#ff55ee;box-shadow:0 0 12px #ff20e855;color:#fff}
+.controls{margin-top:10px;border-top:1px solid #ffffff18;padding-top:9px}
+.sliderRow{display:flex;align-items:center;gap:7px;color:#bbb;font-size:10px;margin:6px 0}
+.sliderRow span{width:75px}
+.sliderRow input{flex:1}
+.smallButtons{display:flex;gap:6px;margin-top:8px}
+.smallButtons button{flex:1;background:#18101e;color:#fff;border:1px solid #43274b;border-radius:7px;padding:7px;font-size:10px}
+#reticle{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 10px #fff;opacity:.35;z-index:8;pointer-events:none}
+@media(max-width:600px){#menu{width:300px}.modeBtn{font-size:9px;padding:7px 3px}}
 </style>
 </head>
 <body>
 <div id="startScreen">
-  <h1>◈ PSYCHEDELIC COLLAPSE ◈</h1>
-  <p>click / tap to enter &nbsp;·&nbsp; sound on</p>
-  <p class="warn">Contains fast fine-line moiré patterns and flashing color. Take breaks if you feel discomfort;
-  skip this if you have photosensitive epilepsy.</p>
+<h1>◈ PSYCHEDELIC COLLAPSE ◈</h1>
+<p>click / tap to enter · then explore the ILLUSION LAB</p>
+<p class="warn">Contains strong visual motion, fine patterns and flashing color. Stop if you feel discomfort. A comfort mode is available.</p>
 </div>
-<div id="overlay" style="display:none">◈ PSYCHEDELIC COLLAPSE ◈</div>
-<div id="hint" style="display:none">move mouse to look &nbsp;·&nbsp; VR button appears below if headset detected</div>
+
+<div id="overlay" style="display:none">◈ ILLUSION LAB // <span id="overlayMode">PSYCHEDELIC COLLAPSE</span> ◈</div>
+<div id="hint" style="display:none">mouse / headset movement to look · VR menu can be opened with the controller select ray</div>
+<div id="reticle"></div>
 <div id="vrButtonContainer"></div>
 
+<div id="menu" class="hidden">
+<div class="menuTitle">◈ MIND LAB</div>
+<div id="modeName">PSYCHEDELIC COLLAPSE</div>
+<div class="grid">
+<button class="modeBtn active" data-mode="collapse">COLLAPSE</button>
+<button class="modeBtn" data-mode="tunnel">INFINITE TUNNEL</button>
+<button class="modeBtn" data-mode="impossible">IMPOSSIBLE ROOM</button>
+<button class="modeBtn" data-mode="mirror">INFINITE MIRROR</button>
+<button class="modeBtn" data-mode="spiral">SPIRAL VISION</button>
+<button class="modeBtn" data-mode="fractal">FRACTAL VOID</button>
+<button class="modeBtn" data-mode="warp">REALITY WARP</button>
+<button class="modeBtn" data-mode="peripheral">PERIPHERAL</button>
+<button class="modeBtn" data-mode="afterimage">COLOR AFTERIMAGE</button>
+<button class="modeBtn" data-mode="blackhole">BLACK HOLE</button>
+<button class="modeBtn" data-mode="checker">CHECKERBOARD</button>
+<button class="modeBtn" data-mode="stair">SPIRAL STAIRCASE</button>
+<button class="modeBtn" data-mode="perspective">PERSPECTIVE FLIP</button>
+<button class="modeBtn" data-mode="random">MIND MELT</button>
+</div>
+<div class="controls">
+<div class="sliderRow"><span>Intensity</span><input id="intensity" type="range" min="0" max="2" step=".01" value="1"></div>
+<div class="sliderRow"><span>Speed</span><input id="speed" type="range" min="0" max="2" step=".01" value="1"></div>
+<div class="smallButtons">
+<button id="comfort">COMFORT: OFF</button>
+<button id="menuToggle">HIDE MENU</button>
+</div>
+</div>
+</div>
+
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
 </script>
 
 <script type="module">
 import * as THREE from "three";
 import { VRButton } from "three/addons/webxr/VRButton.js";
 
-let scene, camera, rig, renderer, clock, uniforms;
-let mouseX = 0, mouseY = 0;
-let audioCtx, masterGain;
+let scene,camera,rig,renderer,clock,material,uniforms;
+let mouseX=0,mouseY=0,started=false;
+let audioCtx,masterGain;
+let mode="collapse",intensity=1,speed=1,comfort=false,randomTimer=0;
 
-const startScreen = document.getElementById('startScreen');
-let started = false;
+const startScreen=document.getElementById("startScreen");
+const menu=document.getElementById("menu");
+const modeName=document.getElementById("modeName");
+const overlayMode=document.getElementById("overlayMode");
 
-startScreen.addEventListener('click', begin, { once:true });
-startScreen.addEventListener('touchend', begin, { once:true, passive:true });
+startScreen.addEventListener("click",begin,{once:true});
+startScreen.addEventListener("touchend",begin,{once:true,passive:true});
 
 function begin(){
-  if(started) return;
-  started = true;
-
-  startScreen.style.display = 'none';
-  document.getElementById('overlay').style.display = 'block';
-  document.getElementById('hint').style.display = 'block';
-
-  initAudio();
-  init3D();
+ if(started)return;
+ started=true;
+ startScreen.style.display="none";
+ document.getElementById("overlay").style.display="block";
+ document.getElementById("hint").style.display="block";
+ menu.classList.remove("hidden");
+ initAudio();
+ init3D();
 }
 
-/* ================= AUDIO: static + ringing ================= */
-function makeNoiseBuffer(ctx, seconds){
-  const len = Math.floor(ctx.sampleRate * seconds);
-  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for(let i=0;i<len;i++) d[i] = Math.random()*2-1;
-  return buf;
+function makeNoiseBuffer(ctx,seconds){
+ const len=Math.floor(ctx.sampleRate*seconds),buf=ctx.createBuffer(1,len,ctx.sampleRate),d=buf.getChannelData(0);
+ for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+ return buf;
 }
-function makeImpulse(ctx, seconds, decay){
-  const len = Math.floor(ctx.sampleRate * seconds);
-  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-  for(let ch=0; ch<2; ch++){
-    const d = buf.getChannelData(ch);
-    for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, decay);
-  }
-  return buf;
+function makeImpulse(ctx,seconds,decay){
+ const len=Math.floor(ctx.sampleRate*seconds),buf=ctx.createBuffer(2,len,ctx.sampleRate);
+ for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)}
+ return buf;
 }
-
 function initAudio(){
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  masterGain = audioCtx.createGain();
-  masterGain.gain.value = 0.55;
-
-  const convolver = audioCtx.createConvolver();
-  convolver.buffer = makeImpulse(audioCtx, 3.0, 1.8);
-  const wetGain = audioCtx.createGain();
-  wetGain.gain.value = 0.5;
-  const dryGain = audioCtx.createGain();
-  dryGain.gain.value = 0.8;
-  masterGain.connect(dryGain).connect(audioCtx.destination);
-  masterGain.connect(convolver).connect(wetGain).connect(audioCtx.destination);
-
-  // --- STATIC: crackling filtered noise, like off-tune radio interference ---
-  const noiseSrc = audioCtx.createBufferSource();
-  noiseSrc.buffer = makeNoiseBuffer(audioCtx, 4);
-  noiseSrc.loop = true;
-  const bandpass = audioCtx.createBiquadFilter();
-  bandpass.type = 'bandpass';
-  bandpass.frequency.value = 1200;
-  bandpass.Q.value = 3.5;
-  const staticGain = audioCtx.createGain();
-  staticGain.gain.value = 0.18;
-  noiseSrc.connect(bandpass).connect(staticGain).connect(masterGain);
-  noiseSrc.start();
-  window.__bandpass = bandpass;
-  window.__staticGain = staticGain;
-
-  // random crackle bursts on top of the static bed
-  function crackle(){
-    const now = audioCtx.currentTime;
-    const target = 0.08 + Math.random()*0.35;
-    staticGain.gain.setTargetAtTime(target, now, 0.03);
-    setTimeout(crackle, 60 + Math.random()*220);
-  }
-  crackle();
-
-  // --- CONTINUOUS RINGING: high, thin, tinnitus-like tones that slowly drift ---
-  const ringFreqs = [2800, 4200, 5600];
-  window.__rings = ringFreqs.map((f, i) => {
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = f;
-    const g = audioCtx.createGain();
-    g.gain.value = 0.02 + i*0.005;
-    const pan = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
-    if(pan){ pan.pan.value = (i/ringFreqs.length)*2-1; osc.connect(g).connect(pan).connect(masterGain); }
-    else { osc.connect(g).connect(masterGain); }
-    osc.start();
-    return { osc, base: f, g };
-  });
-
-  // --- STRUCK RINGING: periodic impulses through a high-Q resonant filter, like a struck bell/glass ---
-  function strike(){
-    const now = audioCtx.currentTime;
-    const impulseSrc = audioCtx.createBufferSource();
-    impulseSrc.buffer = makeNoiseBuffer(audioCtx, 0.03);
-    const resonant = audioCtx.createBiquadFilter();
-    resonant.type = 'bandpass';
-    resonant.frequency.value = 400 + Math.random()*3200;
-    resonant.Q.value = 35 + Math.random()*40;
-    const g = audioCtx.createGain();
-    g.gain.value = 0.0001;
-    g.gain.setValueAtTime(0.0001, now);
-    g.gain.exponentialRampToValueAtTime(0.5, now + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 1.8 + Math.random()*1.5);
-    const pan = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
-    impulseSrc.connect(resonant).connect(g);
-    if(pan){ pan.pan.value = Math.random()*2-1; g.connect(pan).connect(masterGain); }
-    else { g.connect(masterGain); }
-    impulseSrc.start(now);
-    setTimeout(strike, 700 + Math.random()*1800);
-  }
-  strike();
+ audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+ masterGain=audioCtx.createGain();masterGain.gain.value=.32;
+ const convolver=audioCtx.createConvolver();convolver.buffer=makeImpulse(audioCtx,2.5,1.8);
+ const wet=audioCtx.createGain();wet.gain.value=.32;
+ masterGain.connect(audioCtx.destination);
+ masterGain.connect(convolver).connect(wet).connect(audioCtx.destination);
+ const noise=audioCtx.createBufferSource();noise.buffer=makeNoiseBuffer(audioCtx,4);noise.loop=true;
+ const filter=audioCtx.createBiquadFilter();filter.type="bandpass";filter.frequency.value=1000;filter.Q.value=2.8;
+ const gain=audioCtx.createGain();gain.gain.value=.07;
+ noise.connect(filter).connect(gain).connect(masterGain);noise.start();
+ window.__filter=filter;
+ const freqs=[260,390,520];
+ window.__tones=freqs.map((f,i)=>{
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type="sine";o.frequency.value=f;g.gain.value=.012+i*.003;o.connect(g).connect(masterGain);o.start();
+  return {o,g,f};
+ });
 }
-
-/* ================= 3D / SHADER DOME ================= */
 function init3D(){
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 0.05, 200);
-  rig = new THREE.Group();
-  rig.add(camera);
-  scene.add(rig);
+ scene=new THREE.Scene();
+ camera=new THREE.PerspectiveCamera(90,innerWidth/innerHeight,.05,200);
+ rig=new THREE.Group();rig.add(camera);scene.add(rig);camera.position.set(0,0,0);
+ renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:"high-performance",alpha:false});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1));
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType("local-floor");
+ document.body.appendChild(renderer.domElement);
+ const b=VRButton.createButton(renderer);document.getElementById("vrButtonContainer").appendChild(b);
 
-  // Keep the camera inside the headset-controlled XR rig.
-  camera.position.set(0, 0, 0);
+ const geo=new THREE.SphereGeometry(50,64,64);
+ uniforms={
+  uTime:{value:0},uMode:{value:0},uIntensity:{value:1},uSpeed:{value:1},
+  uComfort:{value:0},uMouse:{value:new THREE.Vector2()}
+ };
+ material=new THREE.ShaderMaterial({
+  uniforms,side:THREE.BackSide,depthWrite:false,
+  vertexShader:`varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+  fragmentShader:`
+ precision mediump float;
+ varying vec3 vPos;
+ uniform float uTime,uMode,uIntensity,uSpeed,uComfort;
+ uniform vec2 uMouse;
+ #define PI 3.14159265359
 
-  renderer = new THREE.WebGLRenderer({
-    antialias: false,
-    powerPreference: "high-performance",
-    alpha: false
-  });
+ mat2 rot(float a){float s=sin(a),c=cos(a);return mat2(c,-s,s,c);}
+ vec3 rainbow(float t){return .5+.5*cos(6.28318*(t+vec3(0.,.333,.667)));}
+ float hash21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+ float grid(vec2 p,float scale){
+   vec2 q=abs(fract(p*scale)-.5);
+   return 1.-smoothstep(.025,.06,min(q.x,q.y));
+ }
+ float rings(vec2 p,float sc,float spin){
+   float r=length(p),a=atan(p.y,p.x)+spin;
+   float line=abs(fract(log(max(r,.001))*sc/(2.*PI))-.5);
+   return 1.-smoothstep(.08,.20,line);
+ }
+ float spiral(vec2 p){
+   float a=atan(p.y,p.x),r=length(p);
+   return .5+.5*sin(a*18.-r*28.-uTime*2.0*uSpeed);
+ }
+ float tunnel(vec2 p){
+   float r=max(length(p),.002),a=atan(p.y,p.x);
+   float z=fract(1./r*.15+uTime*.18*uSpeed);
+   float spokes=.5+.5*cos(a*24.+z*9.);
+   float bands=1.-smoothstep(.02,.11,abs(z-.5));
+   return bands*(.35+.65*spokes);
+ }
+ float illusion(float m,vec2 p){
+   float t=uTime*uSpeed;
+   float r=length(p),a=atan(p.y,p.x);
+   if(m<.5){
+     float ac=a*14./(2.*PI),rc=log(max(r,.0001))*7./(2.*PI)-t*.35;
+     float d=length(vec2(abs(fract(ac)-.5),abs(fract(rc)-.5)*1.3));
+     float v=1.-smoothstep(.08,.48,d);
+     v+=pow(abs(sin(a*150.+t*2.5)),12.)*.35;
+     return v;
+   }
+   if(m<1.5)return tunnel(p*1.4);
+   if(m<2.5){
+     vec2 q=p; q*=rot(sin(t*.4)*.4);
+     float room=grid(q,3.)*.8+grid(q*rot(PI/2.),3.)*.4;
+     float impossible=.5+.5*sin(q.x*8.+sin(q.y*7.+t)*2.);
+     return room*.7+impossible*.35;
+   }
+   if(m<3.5){
+     float mir=abs(fract((a/PI+1.)*8.)-.5);
+     return (1.-smoothstep(.01,.12,mir))*(.35+.65*sin(r*35.-t*1.2)*.5+.5);
+   }
+   if(m<4.5)return spiral(p*1.5);
+   if(m<5.5){
+     float n=0.;vec2 q=p;
+     for(int i=0;i<5;i++){q=abs(q)/max(dot(q,q),.08)-.72;q*=rot(.35);n+=exp(-8.*abs(length(q)-.55));}
+     return clamp(n*.28,0.,1.);
+   }
+   if(m<6.5){
+     vec2 q=p*rot(sin(t*.25)*.8);
+     q+=vec2(sin(q.y*4.+t)*.13,cos(q.x*5.-t)*.13)*uIntensity;
+     return grid(q,7.)*.65+.35*sin(length(q)*30.-t*2.)*.5+.25;
+   }
+   if(m<7.5){
+     float edge=smoothstep(.15,1.,r);
+     float v=.5+.5*sin(a*30.+t*1.7+r*18.);
+     return v*edge;
+   }
+   if(m<8.5){
+     float c=.5+.5*cos(a*14.+r*9.);
+     float moving=.5+.5*sin(r*28.-t*1.3);
+     return mix(c,moving,.55);
+   }
+   if(m<9.5){
+     float d=length(p);
+     return 1.-smoothstep(.08,.45,abs(d-(.32+.12*sin(t))));
+   }
+   if(m<10.5){
+     float c=step(.5,fract(floor(p.x*9.)+floor(p.y*9.)+floor(t*.7)));
+     return mix(.18,.95,c);
+   }
+   if(m<11.5){
+     float a2=a+sin(r*8.-t)*.18;
+     float stairs=step(.45,fract(a2/PI*10.+r*5.-t*.3));
+     return stairs*(.55+.45*sin(r*35.-t));
+   }
+   if(m<12.5){
+     vec2 q=p;
+     float flip=sin(t*.5);
+     q.x*=sign(flip+.02);
+     return .5+.5*sin(q.x*14.+q.y*14.+t);
+   }
+   return tunnel(p*(1.+.3*sin(t*.23)))+
+          spiral(p*.8+vec2(.15*sin(t*.31),.1*cos(t*.27)));
+ }
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
-  renderer.setSize(window.innerWidth, window.innerHeight);
+ void main(){
+   vec3 dir=normalize(vPos);
+   dir.xy=rot(uMouse.x*.45)*dir.xy;
+   dir.yz=rot(uMouse.y*.30)*dir.yz;
+   float theta=atan(dir.z,dir.x),phi=asin(clamp(dir.y,-1.,1.));
+   float scale=2.25+uIntensity*.22;
+   vec2 p=vec2(theta,phi*2.25)*scale;
+   float v=illusion(uMode,p);
+   float v2=illusion(uMode,p*1.013+vec2(.02,-.013));
+   float v3=illusion(uMode,p*.987+vec2(-.018,.011));
+   vec3 col=vec3(v,v2,v3)*.45;
+   float hue=theta/PI*.5+uTime*.025;
+   col+=rainbow(hue)*v*.72;
 
-  // WebXR
-  renderer.xr.enabled = true;
-  renderer.xr.setReferenceSpaceType('local-floor');
-  renderer.xr.addEventListener('sessionstart', () => {
-    console.log('[XR] session started');
-  });
+   // Stronger peripheral distortion for the peripheral mode.
+   float per=length(dir.xy);
+   if(uMode>6.5&&uMode<8.5){
+     col*=.65+.9*smoothstep(.12,.95,per);
+     col+=rainbow(per+uTime*.03)*.18;
+   }
 
-  renderer.xr.addEventListener('sessionend', () => {
-    console.log('[XR] session ended');
-  });
-  document.body.appendChild(renderer.domElement);
-  const vrButton = VRButton.createButton(renderer);
-  document.getElementById('vrButtonContainer').appendChild(vrButton);
+   // Central depth cue / fake hole.
+   float center=acos(clamp(dot(dir,vec3(0.,0.,-1.)),-1.,1.));
+   float pulse=.23+.055*sin(uTime*1.2*uSpeed);
+   float core=1.-smoothstep(pulse-.045,pulse,center);
+   float rim=1.-smoothstep(.0,.035,abs(center-pulse));
+   col*=1.-core*.82;
+   col+=vec3(rim)*1.1;
 
-  if (navigator.xr) {
-    navigator.xr.isSessionSupported('immersive-vr')
-      .then(supported => {
-        console.log('[XR] immersive-vr supported:', supported);
+   if(uComfort>.5){
+     col*=.8;
+     col=mix(col,vec3(dot(col,vec3(.333))),.08);
+   }
+   col*=.88+.16*sin(uTime*.8+v*6.);
+   col=max(col,vec3(.008));
+   gl_FragColor=vec4(col,1.);
+ }`
+ });
+ scene.add(new THREE.Mesh(geo,material));
 
-        if (!supported) {
-          console.warn('[XR] Immersive VR is not supported on this browser/device.');
-        }
-      })
-      .catch(err => {
-        console.warn('[XR] support check failed:', err);
-      });
-  } else {
-    console.warn(
-      '[XR] WebXR unavailable. Open this page through HTTPS or localhost ' +
-      'and use a browser with WebXR support.'
-    );
-  }
-
-  clock = new THREE.Clock();
-
-  const geometry = new THREE.SphereGeometry(50, 64, 64);
-
-  uniforms = {
-    uTime:     { value: 0.0 },
-    uCollapse: { value: 0.0 },
-    uMouse:    { value: new THREE.Vector2(0,0) }
-  };
-
-  const material = new THREE.ShaderMaterial({
-    uniforms: uniforms,
-    side: THREE.BackSide,
-    depthWrite: false,
-    vertexShader: `
-      varying vec3 vPos;
-      void main(){
-        vPos = position;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      precision mediump float;
-      varying vec3 vPos;
-      uniform float uTime;
-      uniform float uCollapse;
-      uniform vec2 uMouse;
-      #define PI 3.14159265359
-
-      mat2 rot(float a) {
-        float s = sin(a), c = cos(a);
-        return mat2(c,-s,s,c);
-      }
-
-      vec3 rainbow(float t) {
-        return 0.5 + 0.5*cos(6.28318*(t + vec3(0.0,0.333,0.667)));
-      }
-
-      float hash21(vec2 p) {
-        p = fract(p * vec2(123.34,456.21));
-        p += dot(p,p + 45.32);
-        return fract(p.x*p.y);
-      }
-
-      float field(vec2 p, out float hue) {
-        float r = max(length(p),0.0001);
-        float a = atan(p.y,p.x);
-
-        float ac = a*14.0/(2.0*PI);
-        float rc = log(r)*7.0/(2.0*PI)-uTime*(0.35+uCollapse*0.5);
-
-        float af = abs(fract(ac)-0.5);
-        float rf = abs(fract(rc)-0.5);
-        float d = length(vec2(af,rf*1.3));
-
-        float ring = 1.0-smoothstep(0.08,0.48,d);
-        float edge = 1.0-smoothstep(0.01,0.08,abs(d-0.18));
-
-        float seed = hash21(vec2(floor(ac),floor(rc)));
-        hue = fract(seed+rc*0.035-uTime*0.04);
-
-        float x = a*150.0+seed*25.0+uTime*2.5;
-        float fine = pow(abs(sin(x)),12.0);
-        float y = a*70.0-r*18.0+uTime;
-        float moire = fine*(0.25+0.75*sin(y)*sin(y));
-
-        return ring*1.15+edge*0.9+moire*0.45;
-      }
-
-      void main() {
-        vec3 dir = normalize(vPos);
-        dir.xy = rot(uMouse.x*0.45)*dir.xy;
-        dir.yz = rot(uMouse.y*0.30)*dir.yz;
-
-        float theta = atan(dir.z,dir.x);
-        float phi = asin(clamp(dir.y,-1.0,1.0));
-        vec2 p = vec2(theta,phi*2.2)*(2.4+uCollapse*0.45);
-
-        float h1,h2,h3;
-        float v1 = field(p,h1);
-        float v2 = field(p*1.025+vec2(0.02,-0.01),h2);
-        float v3 = field(p*0.975+vec2(-0.02,0.01),h3);
-
-        vec3 col = vec3(v1,v2,v3)*0.48;
-        col += rainbow(h1)*v1*0.75;
-
-        vec3 forward = vec3(0.0,0.0,-1.0);
-        float centerAngle = acos(clamp(dot(dir,forward),-1.0,1.0));
-        float jag = sin(theta*34.0+uTime*1.7)*0.5+0.5;
-        float radius = 0.24+jag*0.055+sin(uCollapse*2.0)*0.025;
-
-        float core = 1.0-smoothstep(radius-0.055,radius,centerAngle);
-        float rim = 1.0-smoothstep(0.0,0.035,abs(centerAngle-radius));
-
-        col *= 1.0-core*0.94;
-        col += vec3(rim)*1.25;
-        col *= 0.92+0.22*sin(uTime*2.2+v1*7.0);
-        col = max(col,vec3(0.015));
-
-        gl_FragColor = vec4(col,1.0);
-      }
-    `
-  });
-
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
-
-  // Catch shader compilation/link errors, especially useful on Quest/WebXR.
-  renderer.debug.checkShaderErrors = true;
-  material.onBeforeCompile = (shader) => {
-    console.log('[Shader] compiling psychedelic VR shader');
-  };
-
-  window.addEventListener('resize', onResize);
-  window.addEventListener('mousemove', onMouseMove);
-  window.addEventListener('touchmove', onTouchMove, {passive:true});
-
-  renderer.setAnimationLoop(animate);
+ clock=new THREE.Clock();
+ addEvents();
+ renderer.setAnimationLoop(animate);
 }
-
-function onResize(){
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+function addEvents(){
+ addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);
+ });
+ addEventListener("mousemove",e=>{
+  mouseX=(e.clientX/innerWidth-.5)*2;mouseY=(e.clientY/innerHeight-.5)*2;
+ });
+ addEventListener("touchmove",e=>{
+  if(e.touches.length){mouseX=(e.touches[0].clientX/innerWidth-.5)*2;mouseY=(e.touches[0].clientY/innerHeight-.5)*2}
+ });
+ document.querySelectorAll(".modeBtn").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+ document.getElementById("intensity").addEventListener("input",e=>intensity=+e.target.value);
+ document.getElementById("speed").addEventListener("input",e=>speed=+e.target.value);
+ document.getElementById("comfort").addEventListener("click",()=>{
+  comfort=!comfort;
+  document.getElementById("comfort").textContent="COMFORT: "+(comfort?"ON":"OFF");
+ });
+ document.getElementById("menuToggle").addEventListener("click",()=>{
+  menu.classList.toggle("hidden");
+  document.getElementById("menuToggle").textContent=menu.classList.contains("hidden")?"SHOW MENU":"HIDE MENU";
+ });
+ // Desktop keyboard shortcuts; also useful when testing before entering VR.
+ addEventListener("keydown",e=>{
+  if(e.key==="m"||e.key==="M"){menu.classList.toggle("hidden");}
+  if(e.key==="c"||e.key==="C"){comfort=!comfort;document.getElementById("comfort").textContent="COMFORT: "+(comfort?"ON":"OFF");}
+  if(e.key==="r"||e.key==="R")setMode("random");
+ });
 }
-function onMouseMove(e){
-  mouseX = (e.clientX / window.innerWidth - 0.5) * 2.0;
-  mouseY = (e.clientY / window.innerHeight - 0.5) * 2.0;
+const names={
+ collapse:"PSYCHEDELIC COLLAPSE",tunnel:"INFINITE TUNNEL",impossible:"IMPOSSIBLE ROOM",
+ mirror:"INFINITE MIRROR",spiral:"SPIRAL VISION",fractal:"FRACTAL VOID",warp:"REALITY WARP",
+ peripheral:"PERIPHERAL ILLUSION",afterimage:"COLOR AFTERIMAGE",blackhole:"BLACK HOLE",
+ checker:"CHECKERBOARD",stair:"SPIRAL STAIRCASE",perspective:"PERSPECTIVE FLIP",random:"MIND MELT"
+};
+const ids={collapse:0,tunnel:1,impossible:2,mirror:3,spiral:4,fractal:5,warp:6,peripheral:7,afterimage:8,blackhole:9,checker:10,stair:11,perspective:12,random:13};
+function setMode(next){
+ mode=next;
+ uniforms.uMode.value=ids[next];
+ modeName.textContent=names[next];
+ overlayMode.textContent=names[next];
+ document.querySelectorAll(".modeBtn").forEach(b=>b.classList.toggle("active",b.dataset.mode===next));
 }
-function onTouchMove(e){
-  if(e.touches.length>0){
-    mouseX = (e.touches[0].clientX / window.innerWidth - 0.5) * 2.0;
-    mouseY = (e.touches[0].clientY / window.innerHeight - 0.5) * 2.0;
-  }
-}
-
 function animate(){
-  const t = clock.getElapsedTime();
-  uniforms.uTime.value = t;
-  uniforms.uCollapse.value = (Math.sin(t*0.08)*0.5+0.5)*1.4 + Math.sin(t*0.02)*0.3;
+ const t=clock.getElapsedTime();
+ uniforms.uTime.value=t;
+ uniforms.uIntensity.value=intensity;
+ uniforms.uSpeed.value=speed;
+ uniforms.uComfort.value=comfort?1:0;
 
-  if(!renderer.xr.isPresenting){
-    uniforms.uMouse.value.x += (mouseX - uniforms.uMouse.value.x) * 0.05;
-    uniforms.uMouse.value.y += (mouseY - uniforms.uMouse.value.y) * 0.05;
-  }
+ if(!renderer.xr.isPresenting){
+  uniforms.uMouse.value.x+=(mouseX-uniforms.uMouse.value.x)*.05;
+  uniforms.uMouse.value.y+=(mouseY-uniforms.uMouse.value.y)*.05;
+ }
 
-  if(window.__bandpass){
-    window.__bandpass.frequency.setTargetAtTime(600 + Math.sin(t*0.15)*500 + 500, audioCtx.currentTime, 0.15);
+ // Mind Melt changes illusions slowly instead of hard-cutting every few seconds.
+ if(mode==="random"){
+  if(t-randomTimer>9){
+   randomTimer=t;
+   const choices=Object.keys(ids).filter(x=>x!=="random");
+   setMode(choices[Math.floor(Math.random()*choices.length)]);
+   mode="random";
+   uniforms.uMode.value=13;
+   modeName.textContent="MIND MELT // "+names[choices[Math.floor(Math.random()*choices.length)]];
+   overlayMode.textContent=modeName.textContent;
   }
-  if(window.__rings){
-    window.__rings.forEach((rgn, i) => {
-      rgn.osc.frequency.setTargetAtTime(rgn.base * (1 + Math.sin(t*0.05 + i*2.0)*0.006), audioCtx.currentTime, 0.4);
-    });
-  }
+ }
 
-  renderer.render(scene, camera);
+ if(window.__filter)window.__filter.frequency.setTargetAtTime(
+   700+Math.sin(t*.13)*350, audioCtx.currentTime,.15
+ );
+ if(window.__tones)window.__tones.forEach((x,i)=>{
+   x.o.frequency.setTargetAtTime(x.f*(1+Math.sin(t*.07+i)*.012*speed),audioCtx.currentTime,.3);
+ });
+ renderer.render(scene,camera);
 }
 </script>
 </body>
